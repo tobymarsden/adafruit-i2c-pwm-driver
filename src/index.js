@@ -41,7 +41,7 @@ function makePwmDriver (options) {
 
   const init = () => {
     if (debug) {
-      console.log(`device //{device}, adress:${address}, debug:${debug}`)
+      console.log(`device ${device}, address:${address}, debug:${debug}`)
       console.log(`Reseting PCA9685, mode1: ${MODE1}`)
     }
     // i2c.writeByte(0x06) // SWRST
