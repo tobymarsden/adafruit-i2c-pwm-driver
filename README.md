@@ -22,8 +22,8 @@ npm i adafruit-i2c-pwm-driver
 ## Usage
 
 ```js
-const makePwmDriver = require('adafruit-i2c-pwm')
-const pwmDriver = makePwmDriver({address: 0x40, device: '/dev/i2c-1'})
+const makePwmDriver = require('adafruit-i2c-pwm-driver')
+const pwmDriver = makePwmDriver({address: 0x40, device: '/dev/i2c-1', debug: true})
 
 pwmDriver.init()
   .then(() => pwmDriver.setPWMFreq(50))
