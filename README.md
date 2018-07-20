@@ -23,7 +23,7 @@ npm i adafruit-i2c-pwm-driver
 
 ```js
 const makePwmDriver = require('adafruit-i2c-pwm-driver')
-const pwmDriver = makePwmDriver({address: 0x40, device: '/dev/i2c-1', debug: true})
+const pwmDriver = makePwmDriver({address: 0x40, device: '/dev/i2c-1', debug: true, i2cDebug: false})
 
 pwmDriver.init()
   .then(() => pwmDriver.setPWMFreq(50))
@@ -39,13 +39,14 @@ you can find a simple example [here](https://raw.githubusercontent.com/kaosat-de
 ## API
 
 
-`makePwmDriver({address:Number,device:String,debug:Bool})`
+`makePwmDriver({address:Number, device:String, debug:Bool, i2cDebug:Bool})`
 
 Setting up a new PwmDriver
 
 - address: Address of the i2c panel, e.g. 0x20
 - device: Device name, e.g. '/dev/i2c-1' (defaults to /dev/i2c-1)
 - debug: flag used to display debug messages
+- i2cDebug: flag used to display i2c signals
 
 `pwmDriver.init()`
 
