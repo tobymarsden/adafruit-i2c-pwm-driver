@@ -1,8 +1,5 @@
 # Adafruit I2C PWM Driver
 
-[![npm version](https://badge.fury.io/js/adafruit-i2c-pwm-driver.svg)](https://badge.fury.io/js/adafruit-i2c-pwm-driver)
-
-
 Node.js implementation for the Adafruit 16-Channel 12-bit PWM/Servo Driver
 http://www.adafruit.com/products/815
 
