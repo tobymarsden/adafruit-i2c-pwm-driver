@@ -37,53 +37,41 @@ function makePwmDriver(options) {
   var defaults = {
     address: 0x40,
     device: '/dev/i2c-1',
-    debug: false
+    debug: false,
+    i2cDebug: false
   };
 
   var _Object$assign = Object.assign({}, defaults, options),
       address = _Object$assign.address,
       device = _Object$assign.device,
-      debug = _Object$assign.debug;
+      debug = _Object$assign.debug,
+      i2cDebug = _Object$assign.i2cDebug;
 
-  var i2c = I2C(address, { device: device, debug: debug });
+  var i2c = I2C(address, { device: device, i2cDebug: i2cDebug });
   var prescale = void 0;
 
   var init = function init() {
     if (debug) {
-      console.log('device //{device}, adress:' + address + ', debug:' + debug);
+      console.log('device ' + device + ', address:' + address + ', debug:' + debug);
       console.log('Reseting PCA9685, mode1: ' + MODE1);
     }
-    // i2c.writeByte(0x06) // SWRST
-    // i2c.writeBytes(MODE1, 0x00)
-    //
-    /*await setAllPWM(0, 0)
-    await i2c.writeBytes(MODE2, OUTDRV)
-    await i2c.writeBytes(MODE1, ALLCALL)
-    sleep.usleep(5000) // wait for oscillator
-     let mode1 =  await i2c.readBytes(MODE1, 1)
-    mode1 = mode1 & ~SLEEP // wake up (reset sleep)
-    await i2c.writeBytes(MODE1, mode1)
-    sleep.usleep(5000) // wait for oscillator
-     if (debug) {
-      console.log('init done')
-    }
-    */
 
-    // i2c.writeBytes(MODE1, 0x00)
-    // in the future use await i2c.writeBytes(MODE1, ALLCALL)
-    setAllPWM(0, 0);
-    i2c.writeBytes(MODE2, OUTDRV);
-    i2c.writeBytes(MODE1, ALLCALL);
-    (0, _sleep.usleep)(5000).then(function (x) {
-      return i2c.readBytes(MODE1, 1).then(function (mode1) {
-        mode1 = mode1 & ~SLEEP; // wake up (reset sleep)
-        return i2c.writeBytes(MODE1, mode1);
-      }).then((0, _sleep.usleep)(5000)) // wait for oscillator)
-      .then(function (x) {
-        return debug ? console.log('init done ') : '';
-      }).catch(function (e) {
-        return console.error('error in init', e);
-      });
+    return setAllPWM(0, 0).then(function () {
+      return i2c.writeBytes(MODE2, OUTDRV);
+    }).then(function () {
+      return i2c.writeBytes(MODE1, ALLCALL);
+    }).then(function () {
+      return (0, _sleep.usleep)(5000);
+    }).then(function () {
+      return i2c.readBytes(MODE1, 1);
+    }).then(function (mode1) {
+      mode1 = mode1 & ~SLEEP; // wake up (reset sleep)
+      return i2c.writeBytes(MODE1, mode1);
+    }).then(function () {
+      return (0, _sleep.usleep)(5000);
+    }) // wait for oscillator)
+    .then(function () {
+      return debug ? console.log('init done ') : '';
     });
   };
 
@@ -103,18 +91,23 @@ function makePwmDriver(options) {
       console.log('Final pre-scale: ' + prescale);
     }
 
+    var oldmode = void 0;
+    var newmode = void 0;
     return i2c.readBytes(MODE1, 1).then(function (data) {
-      var oldmode = data[0];
-      var newmode = oldmode & 0x7F | 0x10; // sleep
+      oldmode = data[0];
+      newmode = oldmode & 0x7F | 0x10; // sleep
       if (debug) {
         console.log('prescale ' + Math.floor(prescale) + ', newMode: newmode.toString(16)');
       }
-      i2c.writeBytes(MODE1, newmode); // go to sleep
-      i2c.writeBytes(PRESCALE, Math.floor(prescale));
-      i2c.writeBytes(MODE1, oldmode);
-      (0, _sleep.usleep)(5000).then(function (x) {
-        return i2c.writeBytes(MODE1, oldmode | 0x80);
-      });
+      return i2c.writeBytes(MODE1, newmode); // go to sleep
+    }).then(function () {
+      return i2c.writeBytes(PRESCALE, Math.floor(prescale));
+    }).then(function () {
+      return i2c.writeBytes(MODE1, oldmode);
+    }).then(function () {
+      return (0, _sleep.usleep)(5000);
+    }).then(function () {
+      return i2c.writeBytes(MODE1, oldmode | 0x80);
     });
   };
 
@@ -123,37 +116,34 @@ function makePwmDriver(options) {
     if (debug) {
       console.log('Setting PWM channel, channel: ' + channel + ', on : ' + on + ' off ' + off);
     }
-    /*await i2c.writeBytes(LED0_ON_L + 4 * channel, on & 0xFF)
-    await i2c.writeBytes(LED0_ON_H + 4 * channel, on >> 8)
-    await i2c.writeBytes(LED0_OFF_L + 4 * channel, off & 0xFF)
-    await i2c.writeBytes(LED0_OFF_H + 4 * channel, off >> 8)*/
-    i2c.writeBytes(LED0_ON_L + 4 * channel, on & 0xFF);
-    i2c.writeBytes(LED0_ON_H + 4 * channel, on >> 8);
-    i2c.writeBytes(LED0_OFF_L + 4 * channel, off & 0xFF);
-    i2c.writeBytes(LED0_OFF_H + 4 * channel, off >> 8);
+    return i2c.writeBytes(LED0_ON_L + 4 * channel, on & 0xFF).then(function () {
+      return i2c.writeBytes(LED0_ON_H + 4 * channel, on >> 8);
+    }).then(function () {
+      return i2c.writeBytes(LED0_OFF_L + 4 * channel, off & 0xFF);
+    }).then(function () {
+      return i2c.writeBytes(LED0_OFF_H + 4 * channel, off >> 8);
+    });
   };
 
   var setAllPWM = function setAllPWM(on, off) {
-    /*await i2c.writeBytes(ALL_LED_ON_L, on & 0xFF)
-    await i2c.writeBytes(ALL_LED_ON_H, on >> 8)
-    await i2c.writeBytes(ALL_LED_OFF_L, off & 0xFF)
-    await i2c.writeBytes(ALL_LED_OFF_H, off >> 8)*/
-    i2c.writeBytes(ALL_LED_ON_L, on & 0xFF);
-    i2c.writeBytes(ALL_LED_ON_H, on >> 8);
-    i2c.writeBytes(ALL_LED_OFF_L, off & 0xFF);
-    i2c.writeBytes(ALL_LED_OFF_H, off >> 8);
+    return i2c.writeBytes(ALL_LED_ON_L, on & 0xFF).then(function () {
+      return i2c.writeBytes(ALL_LED_ON_H, on >> 8);
+    }).then(function () {
+      return i2c.writeBytes(ALL_LED_OFF_L, off & 0xFF);
+    }).then(function () {
+      return i2c.writeBytes(ALL_LED_OFF_H, off >> 8);
+    });
   };
 
   var stop = function stop() {
     return i2c.writeBytes(ALL_LED_OFF_H, 0x01);
   };
 
-  // actual init
-  init();
-
   return {
+    init: init,
     setPWM: setPWM,
     setAllPWM: setAllPWM,
     setPWMFreq: setPWMFreq,
-    stop: stop };
+    stop: stop
+  };
 }

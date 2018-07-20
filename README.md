@@ -22,12 +22,13 @@ npm i adafruit-i2c-pwm-driver
 ## Usage
 
 ```js
-const makePwmDriver = require('adafruit-i2c-pwm')
-const pwmDriver = makePwmDriver({address: 0x40, device: '/dev/i2c-1'})
+const makePwmDriver = require('adafruit-i2c-pwm-driver')
+const pwmDriver = makePwmDriver({address: 0x40, device: '/dev/i2c-1', debug: true, i2cDebug: false})
 
-pwmDriver.setPWMFreq(50)
-pwmDriver.setPWM(2) // channel, on , off
-
+pwmDriver.init()
+  .then(() => pwmDriver.setPWMFreq(50))
+  .then(() => pwmDriver.setPWM(2))// channel, on , off
+  .catch(console.error);
 ```
 
 To configure I2c on your Raspberry-pi / Beaglebone please see [here](https://npmjs.org/package/i2c)
@@ -38,25 +39,30 @@ you can find a simple example [here](https://raw.githubusercontent.com/kaosat-de
 ## API
 
 
-`makePwmDriver({address:Number,device:String,debug:Bool})`
+`makePwmDriver({address:Number, device:String, debug:Bool, i2cDebug:Bool})`
 
 Setting up a new PwmDriver
 
 - address: Address of the i2c panel, e.g. 0x20
 - device: Device name, e.g. '/dev/i2c-1' (defaults to /dev/i2c-1)
 - debug: flag used to display debug messages
+- i2cDebug: flag used to display i2c signals
+
+`pwmDriver.init()`
+
+Initialize the PwmDriver. Only required once after `makePwmDriver`. Returns a Promise.
 
 `pwmDriver.setPWMFreq(frequency:Number)`
 
-Set the PWM frequency to the provided value (in hertz).
+Set the PWM frequency to the provided value (in hertz). Returns a Promise.
 
 `pwmDriver.setPWM(channel:Number, on:Number, off:Number)`
 
-Sets a single PWM channel.
+Sets a single PWM channel. Returns a Promise.
 
 `pwmDriver.setALLPWM(channel:Number, on:Number, off:Number)`
 
-Sets all PWM channels.
+Sets all PWM channels. Returns a Promise.
 
 
 ## Contribute
