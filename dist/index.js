@@ -12,27 +12,27 @@ module.exports = makePwmDriver;
 
 function makePwmDriver(options) {
   // Registers/etc.
-  var MODE1 = 0x00;
-  var MODE2 = 0x01;
-  var SUBADR1 = 0x02;
-  var SUBADR2 = 0x03;
-  var SUBADR3 = 0x04;
-  var PRESCALE = 0xFE;
-  var LED0_ON_L = 0x06;
-  var LED0_ON_H = 0x07;
-  var LED0_OFF_L = 0x08;
-  var LED0_OFF_H = 0x09;
-  var ALL_LED_ON_L = 0xFA;
-  var ALL_LED_ON_H = 0xFB;
-  var ALL_LED_OFF_L = 0xFC;
-  var ALL_LED_OFF_H = 0xFD;
+  var MODE1 = 0x00,
+      MODE2 = 0x01,
+      SUBADR1 = 0x02,
+      SUBADR2 = 0x03,
+      SUBADR3 = 0x04,
+      PRESCALE = 0xFE,
+      LED0_ON_L = 0x06,
+      LED0_ON_H = 0x07,
+      LED0_OFF_L = 0x08,
+      LED0_OFF_H = 0x09,
+      ALL_LED_ON_L = 0xFA,
+      ALL_LED_ON_H = 0xFB,
+      ALL_LED_OFF_L = 0xFC,
+      ALL_LED_OFF_H = 0xFD;
 
   // Bits:
-  var RESTART = 0x80;
-  var SLEEP = 0x10;
-  var ALLCALL = 0x01;
-  var INVRT = 0x10;
-  var OUTDRV = 0x04;
+  var RESTART = 0x80,
+      SLEEP = 0x10,
+      ALLCALL = 0x01,
+      INVRT = 0x10,
+      OUTDRV = 0x04;
 
   var defaults = {
     address: 0x40,
@@ -69,7 +69,7 @@ function makePwmDriver(options) {
       return i2c.writeBytes(MODE1, mode1);
     }).then(function () {
       return (0, _sleep.usleep)(5000);
-    }) // wait for oscillator)
+    }) // wait for oscillator
     .then(function () {
       return debug ? console.log('init done ') : '';
     });
@@ -97,7 +97,7 @@ function makePwmDriver(options) {
       oldmode = data[0];
       newmode = oldmode & 0x7F | 0x10; // sleep
       if (debug) {
-        console.log('prescale ' + Math.floor(prescale) + ', newMode: newmode.toString(16)');
+        console.log('Prescale ' + Math.floor(prescale) + ', newMode: ' + newmode.toString(16));
       }
       return i2c.writeBytes(MODE1, newmode); // go to sleep
     }).then(function () {
@@ -114,25 +114,25 @@ function makePwmDriver(options) {
   // Sets a single PWM channel
   var setPWM = function setPWM(channel, on, off) {
     if (debug) {
-      console.log('Setting PWM channel, channel: ' + channel + ', on : ' + on + ' off ' + off);
+      console.log('Setting PWM channel: ' + channel + ', on : ' + on + ' off ' + off);
     }
-    return i2c.writeBytes(LED0_ON_L + 4 * channel, on & 0xFF).then(function () {
-      return i2c.writeBytes(LED0_ON_H + 4 * channel, on >> 8);
-    }).then(function () {
-      return i2c.writeBytes(LED0_OFF_L + 4 * channel, off & 0xFF);
-    }).then(function () {
-      return i2c.writeBytes(LED0_OFF_H + 4 * channel, off >> 8);
-    });
+    return Promise.all([i2c.writeBytes(LED0_ON_L + 4 * channel, on & 0xFF), i2c.writeBytes(LED0_ON_H + 4 * channel, on >> 8), i2c.writeBytes(LED0_OFF_L + 4 * channel, off & 0xFF), i2c.writeBytes(LED0_OFF_H + 4 * channel, off >> 8)]);
+    /*
+    return i2c.writeBytes(LED0_ON_L + 4 * channel, on & 0xFF)
+      .then(() => i2c.writeBytes(LED0_ON_H + 4 * channel, on >> 8))
+      .then(() => i2c.writeBytes(LED0_OFF_L + 4 * channel, off & 0xFF))
+      .then(() => i2c.writeBytes(LED0_OFF_H + 4 * channel, off >> 8));
+    */
   };
 
   var setAllPWM = function setAllPWM(on, off) {
-    return i2c.writeBytes(ALL_LED_ON_L, on & 0xFF).then(function () {
-      return i2c.writeBytes(ALL_LED_ON_H, on >> 8);
-    }).then(function () {
-      return i2c.writeBytes(ALL_LED_OFF_L, off & 0xFF);
-    }).then(function () {
-      return i2c.writeBytes(ALL_LED_OFF_H, off >> 8);
-    });
+    return Promise.all([i2c.writeBytes(ALL_LED_ON_L, on & 0xFF), i2c.writeBytes(ALL_LED_ON_H, on >> 8), i2c.writeBytes(ALL_LED_OFF_L, off & 0xFF), i2c.writeBytes(ALL_LED_OFF_H, off >> 8)]);
+    /*
+    return i2c.writeBytes(ALL_LED_ON_L, on & 0xFF)
+      .then(() => i2c.writeBytes(ALL_LED_ON_H, on >> 8))
+      .then(() => i2c.writeBytes(ALL_LED_OFF_L, off & 0xFF))
+      .then(() => i2c.writeBytes(ALL_LED_OFF_H, off >> 8));
+    */
   };
 
   var stop = function stop() {
