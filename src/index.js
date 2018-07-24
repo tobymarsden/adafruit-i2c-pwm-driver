@@ -103,12 +103,6 @@ function makePwmDriver (options) {
       i2c.writeBytes(LED0_OFF_L + 4 * channel, off & 0xFF),
       i2c.writeBytes(LED0_OFF_H + 4 * channel, off >> 8),
     ]);
-    /*
-    return i2c.writeBytes(LED0_ON_L + 4 * channel, on & 0xFF)
-      .then(() => i2c.writeBytes(LED0_ON_H + 4 * channel, on >> 8))
-      .then(() => i2c.writeBytes(LED0_OFF_L + 4 * channel, off & 0xFF))
-      .then(() => i2c.writeBytes(LED0_OFF_H + 4 * channel, off >> 8));
-    */
   }
 
   const setAllPWM = (on, off) => {
@@ -118,12 +112,6 @@ function makePwmDriver (options) {
       i2c.writeBytes(ALL_LED_OFF_L, off & 0xFF),
       i2c.writeBytes(ALL_LED_OFF_H, off >> 8),
     ]);
-    /*
-    return i2c.writeBytes(ALL_LED_ON_L, on & 0xFF)
-      .then(() => i2c.writeBytes(ALL_LED_ON_H, on >> 8))
-      .then(() => i2c.writeBytes(ALL_LED_OFF_L, off & 0xFF))
-      .then(() => i2c.writeBytes(ALL_LED_OFF_H, off >> 8));
-    */
   }
 
   const stop = () => i2c.writeBytes(ALL_LED_OFF_H, 0x01);
