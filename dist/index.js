@@ -52,8 +52,8 @@ function makePwmDriver(options) {
 
   var init = function init() {
     if (debug) {
-      console.log('device ' + device + ', address:' + address + ', debug:' + debug);
-      console.log('Reseting PCA9685, mode1: ' + MODE1);
+      console.log('Setting up PWM driver with device ' + device + ', address:' + address + ', debug:' + debug);
+      console.log('Resetting PCA9685, mode1: ' + MODE1);
     }
 
     return setAllPWM(0, 0).then(function () {
@@ -71,7 +71,12 @@ function makePwmDriver(options) {
       return (0, _sleep.usleep)(5000);
     }) // wait for oscillator
     .then(function () {
-      return debug ? console.log('init done ') : '';
+      return new Promise(function (resolve, reject) {
+        if (debug) {
+          console.log('PWM driver initialized');
+        }
+        resolve();
+      });
     });
   };
 
