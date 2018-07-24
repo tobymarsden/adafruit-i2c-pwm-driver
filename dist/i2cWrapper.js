@@ -34,7 +34,6 @@ function makeI2CWrapper(address, _ref) {
         if (error) {
           return reject(error);
         }
-
         resolve(data);
       });
     });

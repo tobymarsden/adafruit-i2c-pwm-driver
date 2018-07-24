@@ -10,7 +10,7 @@ var NanoTimer = require('nanotimer');
 function sleep(seconds) {
   return new Promise(function (resolve, reject) {
     var timer = new NanoTimer();
-    timer.setTimeout(function (x) {
+    timer.setTimeout(function () {
       return resolve(seconds);
     }, '', seconds + 's');
     timer.clearInterval();
@@ -20,7 +20,7 @@ function sleep(seconds) {
 function usleep(micros) {
   return new Promise(function (resolve, reject) {
     var timer = new NanoTimer();
-    timer.setTimeout(function (x) {
+    timer.setTimeout(function () {
       return resolve(micros);
     }, '', micros + 'u');
     timer.clearInterval();
