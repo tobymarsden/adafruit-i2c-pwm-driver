@@ -4,7 +4,6 @@
 - [Installation](#installation)
 - [Usage](#usage)
 - [API](#api)
-- [Contribute](#contribute)
 - [License](#license)
 
 
