@@ -1,16 +1,35 @@
 # Adafruit I2C PWM Driver
 
-Node.js implementation for the Adafruit 16-Channel 12-bit PWM/Servo Driver
-http://www.adafruit.com/products/815
-
+- [About](#about)
 - [Installation](#installation)
 - [Usage](#usage)
 - [API](#api)
 - [Contribute](#contribute)
 - [License](#license)
 
+
+## About
+
+Node.js driver implementation for a PWM i2c device (PCA9685) present in these products:
+- [Adafruit 16-Channel 12-bit PWM/Servo Driver - I2C interface - PCA9685](http://www.adafruit.com/products/815)
+- [Adafruit 16-Channel PWM / Servo HAT for Raspberry Pi](https://www.adafruit.com/product/2327)
+
+This project is a fork from [this project](https://github.com/dominicbosch/adafruit-i2c-pwm-driver) that is a fork from [this project](https://github.com/kaosat-dev/adafruit-i2c-pwm-driver) (original, unmaintained).<br/>
+This bring the following to the original project:
+- maintains promise chains
+- servious code cleanup
+- ES6 syntax
+- improved debugging options
+
+Try out this project with my [PWM Controller App](https://github.com/pozil/pwm-controller).
+
+
 ## Installation
 
+Before installing the driver you need to enable i2c on the Raspberry Pi.<br/>
+Follow [these steps](http://ozzmaker.com/i2c/) to enable it while ignoring the Python related instructions: you do not need to install `libi2c-dev` and `python-smbus` (first and last set of instructions).
+
+Install the driver with this command:
 ```
 npm i adafruit-i2c-pwm-driver
 ```
@@ -40,10 +59,10 @@ you can find a simple example [here](https://raw.githubusercontent.com/kaosat-de
 
 Setting up a new PwmDriver
 
-- address: Address of the i2c panel, e.g. 0x20
-- device: Device name, e.g. '/dev/i2c-1' (defaults to /dev/i2c-1)
-- debug: flag used to display debug messages
-- i2cDebug: flag used to display i2c signals
+- `address`: Address of the i2c panel, e.g. 0x20
+- `device`: Device name, e.g. '/dev/i2c-1' (defaults to /dev/i2c-1)
+- `debug`: flag used to display debug messages
+- `i2cDebug`: flag used to display i2c signals
 
 `pwmDriver.init()`
 
@@ -60,14 +79,6 @@ Sets a single PWM channel. Returns a Promise.
 `pwmDriver.setALLPWM(channel:Number, on:Number, off:Number)`
 
 Sets all PWM channels. Returns a Promise.
-
-
-## Contribute
-
-PRs accepted.
-
-Small note: If editing the Readme, please conform to the [standard-readme](https://github.com/RichardLitt/standard-readme) specification.
-
 
 ## License
 MIT
