@@ -31,7 +31,7 @@ Follow [these steps](http://ozzmaker.com/i2c/) to enable it while ignoring the P
 
 Install the driver with this command:
 ```
-npm i adafruit-i2c-pwm-driver
+npm i git://github.com/pozil/adafruit-i2c-pwm-driver.git
 ```
 
 
