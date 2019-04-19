@@ -16,8 +16,7 @@ Node.js driver implementation for a PWM i2c device (PCA9685) present in these pr
 This project is a fork from [this project](https://github.com/dominicbosch/adafruit-i2c-pwm-driver) that is a fork from [this project](https://github.com/kaosat-dev/adafruit-i2c-pwm-driver) (original, unmaintained).<br/>
 This bring the following to the original project:
 - maintains promise chains
-- serious code cleanup
-- ES6 syntax
+- major code cleanup and refactoring to use ES6 syntax
 - improved debugging options
 - unit tests
 - capability to compile on non Unix systems
@@ -27,22 +26,22 @@ Try out this project with my [PWM Controller App](https://github.com/pozil/pwm-c
 
 ## Installation
 
-Before installing the driver you need to **enable i2c on the Raspberry Pi**.<br/>
+Before installing the driver on a Raspberry Pi you need to **enable i2c**.<br/>
 Follow [these steps](http://ozzmaker.com/i2c/) to enable it while ignoring the Python related instructions: you do not need to install `libi2c-dev` and `python-smbus` (first and last set of instructions).
-
-The driver can **only be installed or built on a Raspberry Pi**. Installing it or building it in any other environement will fail due to the lack of i2c support.
 
 Install the driver with this command:
 ```
-npm i git://github.com/pozil/adafruit-i2c-pwm-driver.git
+npm i adafruit-i2c-pwm-driver-async
 ```
 
-Install the i2c driver with this command:
+The driver requires a i2c binding to run but the binding is kept apart from the project dependencies in order to support compilation on non Unix systems.
+Install the i2c binding dependency on a Raspberry Pi with this command:
 ```
-npm install i2c
+./install-i2c.sh
 ```
 
-The i2c dependency is kept apart from the project dependencies in order to support compilation on non Unix systems.
+Reminder: running this command will fail on non Unix systems.
+If you wish to develop on a non Unix system, use the `isMockDriver` flag (see documentation).
 
 
 ## Usage
@@ -55,7 +54,7 @@ const pwm = new PwmDriver({
   address: 0x40,
   device: '/dev/i2c-1',
   debug: true,
-  isMockDriver: true
+  isMockDriver: true // Remove this if running on a Raspberry Pi
 });
 
 // Configure min and max servo pulse lengths
@@ -85,7 +84,6 @@ You can find a simple example [here](https://raw.githubusercontent.com/kaosat-de
 
 ## API
 
-
 `PwmDriver({address:Number, device:String, debug:Bool, i2cDebug:Bool, isMockDriver:Bool})`
 
 Setting up a new PwmDriver
@@ -94,7 +92,7 @@ Setting up a new PwmDriver
 - `device`: Device name (defaults to /dev/i2c-1)
 - `debug`: Flag used to display high level debug messages (defaults to false)
 - `i2cDebug`: Flag used to display low level i2c signals (defaults to false)
-- `isMockDriver`: Whether to use import and use the real i2c driver or not (defaults to false). This is usefull for compiling on non Unix systems that don't support i2c.
+- `isMockDriver`: Whether to use the real i2c binding or not (defaults to false). This is usefull for compiling on non Unix systems that don't support i2c.
 
 `pwmDriver.init()`
 
