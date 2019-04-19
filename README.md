@@ -16,9 +16,11 @@ Node.js driver implementation for a PWM i2c device (PCA9685) present in these pr
 This project is a fork from [this project](https://github.com/dominicbosch/adafruit-i2c-pwm-driver) that is a fork from [this project](https://github.com/kaosat-dev/adafruit-i2c-pwm-driver) (original, unmaintained).<br/>
 This bring the following to the original project:
 - maintains promise chains
-- servious code cleanup
+- serious code cleanup
 - ES6 syntax
 - improved debugging options
+- unit tests
+- capability to compile on non Unix systems
 
 Try out this project with my [PWM Controller App](https://github.com/pozil/pwm-controller).
 
@@ -33,39 +35,68 @@ Install the driver with this command:
 npm i git://github.com/pozil/adafruit-i2c-pwm-driver.git
 ```
 
+Install the i2c driver with this command:
+```
+npm install i2c
+```
+
+The i2c dependency is kept apart from the project dependencies in order to support compilation on non Unix systems.
+
 
 ## Usage
 
 ```js
-const makePwmDriver = require('adafruit-i2c-pwm-driver')
-const pwmDriver = makePwmDriver({address: 0x40, device: '/dev/i2c-1', debug: true, i2cDebug: false})
+const { PwmDriver, sleep } = require('adafruit-i2c-pwm-driver-async');
 
-pwmDriver.init()
-  .then(() => pwmDriver.setPWMFreq(50))
-  .then(() => pwmDriver.setPWM(2))// channel, on , off
+// Configure driver
+const pwm = new PwmDriver({
+  address: 0x40,
+  device: '/dev/i2c-1',
+  debug: true,
+  isMockDriver: true
+});
+
+// Configure min and max servo pulse lengths
+const servoMin = 150; // Min pulse length out of 4096
+const servoMax = 600; // Max pulse length out of 4096
+
+const loop = () => {
+  return sleep(1)
+    .then(pwm.setPWM(0, 0, servoMin))
+    .then(sleep(1))
+    .then(pwm.setPWM(0, 0, servoMax))
+    .then(loop);
+};
+
+// Initialize driver and loop
+pwm.init()
+  .then(pwm.setPWMFreq(50))
+  .then(sleep(1))
+  .then(loop)
   .catch(console.error);
 ```
 
 To configure I2c on your Raspberry-pi / Beaglebone please see [here](https://npmjs.org/package/i2c)
 
-you can find a simple example [here](https://raw.githubusercontent.com/kaosat-dev/adafruit-i2c-pwm-driver/master/examples/simple.js)
+You can find a simple example [here](https://raw.githubusercontent.com/kaosat-dev/adafruit-i2c-pwm-driver/master/examples/simple.js)
 
 
 ## API
 
 
-`makePwmDriver({address:Number, device:String, debug:Bool, i2cDebug:Bool})`
+`PwmDriver({address:Number, device:String, debug:Bool, i2cDebug:Bool, isMockDriver:Bool})`
 
 Setting up a new PwmDriver
 
-- `address`: Address of the i2c panel, e.g. 0x20
-- `device`: Device name, e.g. '/dev/i2c-1' (defaults to /dev/i2c-1)
-- `debug`: flag used to display debug messages
-- `i2cDebug`: flag used to display i2c signals
+- `address`: Address of the i2c panel (defaults to 0x40)
+- `device`: Device name (defaults to /dev/i2c-1)
+- `debug`: Flag used to display high level debug messages (defaults to false)
+- `i2cDebug`: Flag used to display low level i2c signals (defaults to false)
+- `isMockDriver`: Whether to use import and use the real i2c driver or not (defaults to false). This is usefull for compiling on non Unix systems that don't support i2c.
 
 `pwmDriver.init()`
 
-Initialize the PwmDriver. Only required once after `makePwmDriver`. Returns a Promise.
+Initialize the PwmDriver. Only required once after `PwmDriver` constructor is called. Returns a Promise.
 
 `pwmDriver.setPWMFreq(frequency:Number)`
 
@@ -78,6 +109,10 @@ Sets a single PWM channel. Returns a Promise.
 `pwmDriver.setALLPWM(channel:Number, on:Number, off:Number)`
 
 Sets all PWM channels. Returns a Promise.
+
+`pwmDriver.stop()`
+
+Stops PWM signals. Returns a Promise.
 
 ## License
 MIT
@@ -98,5 +133,3 @@ Based on the [Adafruit's Raspberry-Pi Python Code Library](https://github.com/ad
 >
 >  To download, we suggest logging into your Pi with Internet accessibility and typing:
 >  git clone https://github.com/adafruit/Adafruit-Raspberry-Pi-Python-Code.git
-
-[![Standard - JavaScript Style Guide](https://cdn.rawgit.com/feross/standard/master/badge.svg)](https://github.com/feross/standard)

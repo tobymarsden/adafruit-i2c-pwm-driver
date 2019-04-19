@@ -1,15 +1,23 @@
-const NanoTimer = require('nanotimer')
+const NanoTimer = require('nanotimer');
 
-export function sleep (seconds) {
-  return new Promise((resolve, reject) => {
+/**
+ * Wait a number of seconds
+ * @param {number} seconds 
+ */
+export async function sleep(seconds) {
+  return new Promise(resolve => {
     const timer = new NanoTimer();
     timer.setTimeout(() => resolve(seconds), '', `${seconds}s`);
     timer.clearInterval();
   });
 }
 
-export function usleep (micros) {
-  return new Promise((resolve, reject) => {
+/**
+ * Wait a number of microseconds
+ * @param {number} microseconds 
+ */
+export async function usleep(micros) {
+  return new Promise(resolve => {
     const timer = new NanoTimer();
     timer.setTimeout(() => resolve(micros), '', `${micros}u`);
     timer.clearInterval();

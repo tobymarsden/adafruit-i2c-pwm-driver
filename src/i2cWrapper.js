@@ -1,36 +1,60 @@
-const I2C = require('i2c');
+/**
+ * Wraps i2c readBytes, writeBytes functions into async functions
+ * @param {binary} address 
+ * @param {Object} param1 
+ * @param {boolean} isMockDriver 
+ */
+export default function makeI2CWrapper(address, {device, debug}, isMockDriver) {
+  // Only load I2C dependency if this is not a mock driver
+  // This allows to compile on a non Linux OS
+  let i2c = null;
+  if (!isMockDriver) {
+    const I2C = require('i2c');
+    i2c = new I2C(address, {device});
+  }
 
-/*
-  this wrappers wraps the i2c readBytes, writeBytes functions and returns promises
-*/
-function makeI2CWrapper (address, {device, debug}) {
-  const i2c = new I2C(address, {device});
-
-  const readBytes = (cmd, length) => {
+  async function readBytes(cmd, length) {
     return new Promise((resolve, reject) => {
-      i2c.readBytes(cmd, length, (error, data) => {
-        if (error) {
-          return reject(error);
+      if (isMockDriver) {
+        // Fake read data
+        const fakeRead = [];
+        for (let i=0; i<length; i++) {
+          fakeRead.push(0x00);
         }
-        resolve(data);
-      });
+        resolve(fakeRead);
+      } else {
+        // Read actual data
+        i2c.readBytes(cmd, length, (error, data) => {
+          if (error) {
+            return reject(error);
+          }
+          resolve(data);
+        });
+      }
     });
   };
 
-  const writeBytes = (cmd, buf) => {
+  async function writeBytes(cmd, buf) {
     if (!(buf instanceof Array)) {
       buf = [buf];
     }
-    if (debug){
+    if (debug) {
       console.log(`cmd ${cmd.toString(16)} values ${buf}`);
     }
+
     return new Promise((resolve, reject) => {
-      i2c.writeBytes(cmd, buf, (error, data) => {
-        if (error) {
-          return reject(error);
-        }
-        resolve(data);
-      });
+      if (isMockDriver) {
+        // Fake write data
+        resolve();
+      } else {
+        // Write actual data
+        i2c.writeBytes(cmd, buf, (error, data) => {
+          if (error) {
+            return reject(error);
+          }
+          resolve(data);
+        });
+      }
     });
   };
 
@@ -39,5 +63,3 @@ function makeI2CWrapper (address, {device, debug}) {
     writeBytes
   };
 }
-
-module.exports = makeI2CWrapper;
