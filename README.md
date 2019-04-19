@@ -27,8 +27,10 @@ Try out this project with my [PWM Controller App](https://github.com/pozil/pwm-c
 
 ## Installation
 
-Before installing the driver you need to enable i2c on the Raspberry Pi.<br/>
+Before installing the driver you need to **enable i2c on the Raspberry Pi**.<br/>
 Follow [these steps](http://ozzmaker.com/i2c/) to enable it while ignoring the Python related instructions: you do not need to install `libi2c-dev` and `python-smbus` (first and last set of instructions).
+
+The driver can **only be installed or built on a Raspberry Pi**. Installing it or building it in any other environement will fail due to the lack of i2c support.
 
 Install the driver with this command:
 ```
