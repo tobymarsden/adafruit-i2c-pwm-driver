@@ -9,7 +9,7 @@ export default function makeI2CWrapper(address, {device, debug}, isMockDriver) {
   // This allows to compile on a non Linux OS
   let i2c = null;
   if (!isMockDriver) {
-    const I2C = require('i2c');
+    const I2C = require('@abandonware/i2c');
     i2c = new I2C(address, {device});
   }
 
